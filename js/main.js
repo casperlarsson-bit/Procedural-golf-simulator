@@ -7,8 +7,10 @@ scene.add(golfBall.mesh)
 
 function animate() {
     requestAnimationFrame(animate)
-
-    golfBall.euler()
+    setTimeout(function(){
+        golfBall.euler()
+        //code goes here
+   }, 2000); //Time before execution
 
     controls.getAzimuthalAngle() // For angle
     renderer.render(scene, camera)

@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
+import { renderer, scene, camera, controls, init } from './setup.js'
 
 const h = 1 / 60
 const g = 9.82
@@ -13,14 +14,18 @@ class ball {
         this.material = new THREE.MeshStandardMaterial({ color: _color, normalMap: texLoader.load('./textures/golfball-normal.jpg') })
         this.mesh = new THREE.Mesh(this.geometry, this.material)
 
-        this.mass = 1
-        this.velocity = new THREE.Vector2(0, 0)
-        this.force = 400
-        this.tau = Math.PI
+        // Physical properties
+        this.mass = 0.6
+        this.velocity = new THREE.Vector2()
+        this.force = 400 // Temp
+        this.tau = 0 
         this.friction = this.mass * g * my
     }
-
+    
     euler() {
+        // @TODO Temp just send ball in direction the user looks, change when implement real controls
+        this.tau = -controls.getAzimuthalAngle() - Math.PI / 2
+
         // Calculate acceleration according to ODE v' = (F - F_friction) / m
         const acceleration = new THREE.Vector2((this.force - this.friction) * Math.cos(this.tau) / this.mass, (this.force - this.friction) * Math.sin(this.tau) / this.mass)
         this.force = 0
@@ -30,7 +35,7 @@ class ball {
 
         // Iterate next position according to Euler's method
         this.mesh.position.x += this.velocity.x * h
-        this.mesh.position.y += this.velocity.y * h
+        this.mesh.position.z += this.velocity.y * h
 
         // Test if ball should stop, then remove friction and set velocity to 0
         if (this.velocity.x * Math.cos(this.tau) < 0) {
