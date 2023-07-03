@@ -2,6 +2,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.mod
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.124/examples/jsm/controls/OrbitControls.js'
 
 const renderer = new THREE.WebGLRenderer()
+renderer.shadowMap.enabled = true
+//renderer.shadowMap.type = THREE.PCFSoftShadowMap
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000) // FOV, window ratio, near, far
 const controls = new OrbitControls(camera, renderer.domElement)
@@ -11,9 +13,9 @@ function setLight() {
     scene.add(light)
     const pointLight = new THREE.PointLight(0xffffff, 1, 0) // Color, near, far
     pointLight.position.set(50, 50, 50)
-    /*pointLight.shadow.mapSize.width = 1024 // Shadow quality
-    pointLight.shadow.mapSize.height = 1024
-    pointLight.castShadow = true*/
+    pointLight.shadow.mapSize.width = 4096 // Shadow quality
+    pointLight.shadow.mapSize.height = 4096
+    pointLight.castShadow = true
     scene.add(pointLight)
 }
 
