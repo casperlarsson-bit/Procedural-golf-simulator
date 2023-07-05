@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { renderer, scene, camera, controls, init } from './setup.js'
 import { rotateAroundWorldAxis } from './rotation.js'
+import { grounds } from './main.js'
 
 const h = 1 / 60
 const g = 9.82
@@ -25,8 +26,9 @@ class ball {
     }
 
     euler() {
+        this.gravity()
+
         // Calculate acceleration according to ODE v' = (F - F_friction) / m
-        //const acceleration = new THREE.Vector3((this.force - this.friction) * Math.cos(this.tau) / this.mass, 0, (this.force - this.friction) * Math.sin(this.tau) / this.mass)
         const acceleration = this.force.sub(this.friction).divideScalar(this.mass)
         this.force = new THREE.Vector3()
 
@@ -43,9 +45,29 @@ class ball {
 
         // Test if ball should stop, then remove friction and set velocity to 0
         if (this.velocity.x * Math.cos(this.tau) < 0) {
+            //if (this.velocity.length() < 0.04) {
             this.friction = new THREE.Vector3()
             this.velocity = new THREE.Vector3()
         }
+    }
+
+    gravity() {
+        // Loop through all grounds and find closest one (downwards)
+
+        const currentGround = grounds[0]
+
+        // if collision or on top of it
+        if (currentGround && this.mesh.position.y <= currentGround.mesh.position.y + currentGround.height / 2 + this.radius) {
+            this.force.y = 0
+            this.velocity.y *= Math.abs(this.velocity.y) < 0.7 ? 0 : -0.7
+            this.mesh.position.y = currentGround.mesh.position.y + currentGround.height / 2 + this.radius
+        }
+        else {
+            // if no collision
+            this.force.y = -g
+        }
+
+
     }
 }
 
