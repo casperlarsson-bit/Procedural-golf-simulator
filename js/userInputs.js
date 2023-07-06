@@ -8,7 +8,7 @@ function handleUserInputs(event) {
     // Space key
     if (keyCode === 32 && golfBall.velocity.length() === 0) {
         golfBall.tau = -controls.getAzimuthalAngle() - Math.PI / 2
-        golfBall.force = new THREE.Vector3(Math.cos(golfBall.tau), 0, Math.sin(golfBall.tau)).multiplyScalar(400)
+        golfBall.force = new THREE.Vector3(Math.cos(golfBall.tau), 0, Math.sin(golfBall.tau)).multiplyScalar(350)
         golfBall.friction = new THREE.Vector3(Math.cos(golfBall.tau), 0, Math.sin(golfBall.tau)).multiplyScalar(golfBall.mass * 9.82 * golfBall.my)
     }
 }

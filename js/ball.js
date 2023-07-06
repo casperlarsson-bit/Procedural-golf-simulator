@@ -53,22 +53,35 @@ class ball {
 
     gravity() {
         // Loop through all grounds and find closest one (downwards)
+        const currentGrounds = grounds.filter(currentGround => {
+            currentGround.boundingBox.copy(currentGround.mesh.geometry.boundingBox).applyMatrix4(currentGround.mesh.matrixWorld)
 
-        const currentGround = grounds[0]
+            return currentGround.boundingBox.min.x < this.mesh.position.x && this.mesh.position.x < currentGround.boundingBox.max.x
+                && currentGround.boundingBox.min.z < this.mesh.position.z && this.mesh.position.z < currentGround.boundingBox.max.z
+                && currentGround.boundingBox.min.y < this.mesh.position.y - this.radius
+        })
+
+        if (currentGrounds.length === 0) {
+            this.friction = new THREE.Vector3()
+            this.force.y = -g * this.mass 
+            return
+        }
+
+        const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
 
         // if collision or on top of it
-        if (currentGround && this.mesh.position.y <= currentGround.mesh.position.y + currentGround.height / 2 + this.radius) {
+        if (this.mesh.position.y <= currentGround.mesh.position.y + currentGround.height / 2 + this.radius) {
             this.force.y = 0
-            this.velocity.y *= Math.abs(this.velocity.y) < 0.7 ? 0 : -0.7
+            this.friction = this.velocity.length() > 0 ? new THREE.Vector3(Math.cos(this.tau), 0, Math.sin(this.tau)).multiplyScalar(this.mass * 9.82 * this.my) : new THREE.Vector3()
+            this.velocity.y *= Math.abs(this.velocity.y) < 0.6 ? 0 : -0.6
             this.mesh.position.y = currentGround.mesh.position.y + currentGround.height / 2 + this.radius
         }
         else {
-            // if no collision
+            // Free falling
+            this.friction = new THREE.Vector3()
             this.force.y = -g
         }
-
-
     }
 }
 
-export { ball }
+export { ball, h }
