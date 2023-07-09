@@ -16,6 +16,8 @@ class ball {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
         this.mesh.castShadow = true
 
+        this.firstHit = true
+
         // Physical properties
         this.mass = _mass
         this.my = 0.55 // Temp
@@ -36,9 +38,10 @@ class ball {
         this.velocity.add(acceleration.multiplyScalar(h))
 
         // Iterate next position according to Euler's method
-        this.mesh.position.x += this.velocity.x * h
-        this.mesh.position.y += this.velocity.y * h
-        this.mesh.position.z += this.velocity.z * h
+        this.mesh.position.copy(this.mesh.position.clone().add(this.velocity.clone().multiplyScalar(h)))
+
+        const arrowHelper = new THREE.ArrowHelper(this.velocity.clone().normalize(), this.mesh.position, this.velocity.length())
+        //scene.add(arrowHelper)
 
         // Rotate ball as it moves
         rotateAroundWorldAxis(this.mesh, new THREE.Vector3(this.velocity.z, 0, -this.velocity.x), this.velocity.length() / this.radius * h)
@@ -63,21 +66,26 @@ class ball {
 
         if (currentGrounds.length === 0) {
             this.friction = new THREE.Vector3()
-            this.force.y = -g * this.mass 
+            this.force.y = -g * this.mass
             return
         }
 
         const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
 
-        // if collision or on top of it
+        // If collision with ground, currently wrong test
         if (this.mesh.position.y <= currentGround.mesh.position.y + currentGround.height / 2 + this.radius) {
-            this.force.y = 0
-            this.friction = this.velocity.length() > 0 ? new THREE.Vector3(Math.cos(this.tau), 0, Math.sin(this.tau)).multiplyScalar(this.mass * 9.82 * this.my) : new THREE.Vector3()
-            this.velocity.y *= Math.abs(this.velocity.y) < 0.6 ? 0 : -0.6
-            this.mesh.position.y = currentGround.mesh.position.y + currentGround.height / 2 + this.radius
+            const dir = currentGround.mesh.rotation.equals(new THREE.Euler(0, 0, 0)) ? this.force : new THREE.Vector3(0, 0, 1).normalize().applyEuler(currentGround.mesh.rotation).multiplyScalar(g * this.mass * Math.cos(0.2))
+
+            this.force = dir
+            if (this.firstHit) this.velocity.y *= Math.abs(this.velocity.y) < 0.6 ? 0 : -0.6
+            //this.velocity.applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2 - 0.2)
+            this.friction = this.velocity.length() > 0 ? this.velocity.clone().normalize().multiplyScalar(this.mass * g * this.my) : new THREE.Vector3()
+            //this.mesh.position.y = currentGround.mesh.position.y + currentGround.height / 2 + this.radius
+            this.firstHit = false
         }
         else {
             // Free falling
+            this.firstHit = true
             this.friction = new THREE.Vector3()
             this.force.y = -g
         }
