@@ -12,12 +12,10 @@ scene.add(golfBall.mesh)
 
 const ground1 = new ground(10, 0.1, 10)
 ground1.mesh.position.y = -1
-ground1.mesh.rotateY(Math.PI / 2)
-ground1.mesh.rotateX(0.2)
 grounds.push(ground1)
 scene.add(ground1.mesh)
 const helper1 = new THREE.Box3Helper(ground1.boundingBox)
-scene.add(helper1)
+//scene.add(helper1)
 
 const ground2 = new ground(20, 0.1, 10, 'red')
 ground2.mesh.position.y = -4
