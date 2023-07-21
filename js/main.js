@@ -14,21 +14,6 @@ const ground1 = new ground(10, 0.1, 10)
 ground1.mesh.position.y = -1
 grounds.push(ground1)
 scene.add(ground1.mesh)
-const helper1 = new THREE.Box3Helper(ground1.boundingBox)
-//scene.add(helper1)
-
-const ground2 = new ground(20, 0.1, 10, 'red')
-ground2.mesh.position.y = -2
-ground2.mesh.position.x = -15
-grounds.push(ground2)
-scene.add(ground2.mesh)
-const helper2 = new THREE.Box3Helper(ground2.boundingBox)
-//scene.add(helper2)
-
-const ground3 = new ground(10, 0.1, 10, 'orange')
-ground3.mesh.position.y = -5
-grounds.push(ground3)
-scene.add(ground3.mesh)
 
 function animate() {
     //controls.update()

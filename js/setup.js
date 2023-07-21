@@ -27,4 +27,11 @@ function init() {
     setLight()
 }
 
+// Update the size of the window if the browser ir resized
+window.addEventListener('resize', function () {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+})
+
 export { renderer, scene, camera, controls, init }
