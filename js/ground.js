@@ -24,14 +24,8 @@ class ground {
     }
 
     // Return true if the ball's position is colliding with the ground, false otherwise
-    // You can use bounding volume checks, raycasting, or other collision detection techniques
     isCollidingWithGround(ball) {
-        return ball.mesh.position.y <= this.mesh.position.y + this.height / 2 + ball.radius
-
-        const raycaster = new THREE.Raycaster(ball.mesh.position, new THREE.Vector3(0, -1, 0))
-        const intersections = raycaster.intersectObject(this.mesh)
-
-        return intersections.length > 0 && intersections[0].distance < ball.radius + 0.1
+        return ball.mesh.position.y - ball.radius <= this.mesh.position.y + this.height / 2
     }
 
     // Return the adjusted position vector
@@ -44,7 +38,7 @@ class ground {
             const adjustedPosition = intersections[0].point.clone().add(this.normal.multiplyScalar(ball.radius))
             return adjustedPosition
         }
-        
+
         return ball.mesh.position // No intersection found, return the original position
     }
 }

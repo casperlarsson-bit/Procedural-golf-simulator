@@ -29,17 +29,17 @@ class ball {
 
     euler() {
         this.gravity()
-        
+
         // Calculate acceleration according to ODE v' = (F - F_friction) / m
         const acceleration = this.force.sub(this.friction).divideScalar(this.mass)
         this.force = new THREE.Vector3()
-        
+
         // Iterate next velocity according to Euler's method
         this.velocity.add(acceleration.multiplyScalar(h))
-        
+
         // Iterate next position according to Euler's method
         this.mesh.position.copy(this.mesh.position.clone().add(this.velocity.clone().multiplyScalar(h)))
-        
+
         // Rotate ball as it moves
         rotateAroundWorldAxis(this.mesh, new THREE.Vector3(this.velocity.z, 0, -this.velocity.x), this.velocity.length() / this.radius * h)
 
@@ -61,21 +61,23 @@ class ball {
                 && currentGround.boundingBox.min.y < this.mesh.position.y - this.radius
         })
 
+        // If there is no ground underneath the ball, return
         if (currentGrounds.length === 0) {
             this.friction = new THREE.Vector3()
             this.force.y = -g * this.mass
             return
         }
 
+        // Get the ground with highest y value
         const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
 
         // If collision with ground
         if (currentGround.isCollidingWithGround(this)) {
-            this.force.y = 0
             if (this.firstHit) {
                 this.velocity.y *= Math.abs(this.velocity.y) < 0.6 ? 0 : -0.6
             }
-
+            
+            this.force.y = 0
             this.friction = this.velocity.length() > 0 ? this.velocity.clone().normalize().multiplyScalar(this.mass * g * this.my) : new THREE.Vector3()
             this.firstHit = false
         }
