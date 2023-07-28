@@ -43,7 +43,7 @@ class ball {
         // Rotate ball as it moves
         rotateAroundWorldAxis(this.mesh, new THREE.Vector3(this.velocity.z, 0, -this.velocity.x), this.velocity.length() / this.radius * h)
 
-        // Test if ball should stop, then remove friction and set velocity to 0
+        // Test if ball should stop, then remove friction and set velocity to 0, this has to be done better
         if (this.velocity.x * Math.cos(this.tau) < 0) {
             //if (this.velocity.length() < 0.04) {
             this.friction = new THREE.Vector3()
