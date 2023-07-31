@@ -1,6 +1,6 @@
 class wall {
     constructor() {
-
+        
     }
 }
 
