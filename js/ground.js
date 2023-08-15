@@ -1,5 +1,4 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
-import { scene } from './setup.js'
 
 class ground {
     constructor(_length = 1, _height = 1, _depth = 1, _color = 'lightgreen') {
