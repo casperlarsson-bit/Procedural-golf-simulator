@@ -64,31 +64,15 @@ class ball {
         // If there is no ground underneath the ball, return
         if (currentGrounds.length === 0) {
             this.friction = new THREE.Vector3()
-            this.force.y = -g * this.mass
+            this.force.y = -g // * this.mass
             return
         }
 
         // Get the ground with highest y value
         const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
 
-        // If collision with ground
-        if (currentGround.isCollidingWithGround(this)) {
-            if (this.firstHit) {
-                this.velocity.y *= Math.abs(this.velocity.y) < 0.6 ? 0 : -0.6
-            }
-            
-            this.force.y = 0
-            this.friction = this.velocity.length() > 0 ? this.velocity.clone().normalize().multiplyScalar(this.mass * g * this.my) : new THREE.Vector3()
-            this.firstHit = false
-        }
-        else {
-            // Free falling
-            this.firstHit = true
-            this.friction = new THREE.Vector3()
-            this.force.y = -g
-        }
-
+        currentGround.handleCollision(this)
     }
 }
 
-export { ball, h }
+export { ball, h, g }

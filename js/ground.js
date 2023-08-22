@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
+import { g } from './ball.js'
 
 class ground {
     constructor(_length = 1, _height = 1, _depth = 1, _color = 'lightgreen') {
@@ -20,6 +21,25 @@ class ground {
     calculateNormal() {
         this.normal = new THREE.Vector3(0, 1, 0).applyEuler(this.mesh.rotation)
         return this.normal
+    }
+
+    handleCollision(ball) {
+        // If collision with ground
+        if (this.isCollidingWithGround(ball)) {
+            if (ball.firstHit) {
+                ball.velocity.y *= Math.abs(ball.velocity.y) < 0.6 ? 0 : -0.6
+            }
+
+            ball.force.y = 0
+            ball.friction = ball.velocity.length() > 0 ? ball.velocity.clone().normalize().multiplyScalar(ball.mass * g * ball.my) : new THREE.Vector3()
+            ball.firstHit = false
+        }
+        else {
+            // Free falling
+            ball.firstHit = true
+            ball.friction = new THREE.Vector3()
+            ball.force.y = -g // * ball.mass
+        }
     }
 
     // Return true if the ball's position is colliding with the ground, false otherwise

@@ -25,7 +25,7 @@ class levelPart {
     addToScene() {
         scene.add(this.ground.mesh)
 
-        this.walls.forEach(wall => scene.add(wall))
+        this.walls.forEach(wall => scene.add(wall.mesh))
     }
 
     // Generate a level part
