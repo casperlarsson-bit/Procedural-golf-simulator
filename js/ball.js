@@ -1,7 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { renderer, scene, camera, controls, init } from './setup.js'
 import { rotateAroundWorldAxis } from './rotation.js'
-import { grounds } from './main.js'
+import { grounds, walls } from './main.js'
 
 const h = 1 / 60
 const g = 9.82
@@ -29,6 +29,7 @@ class ball {
 
     euler() {
         this.gravity()
+        this.wallCollision()
 
         // Calculate acceleration according to ODE v' = (F - F_friction) / m
         const acceleration = this.force.sub(this.friction).divideScalar(this.mass)
@@ -44,8 +45,8 @@ class ball {
         rotateAroundWorldAxis(this.mesh, new THREE.Vector3(this.velocity.z, 0, -this.velocity.x), this.velocity.length() / this.radius * h)
 
         // Test if ball should stop, then remove friction and set velocity to 0, this has to be done better
-        if (this.velocity.x * Math.cos(this.tau) < 0) {
-            //if (this.velocity.length() < 0.04) {
+        //if (this.velocity.x * Math.cos(this.tau) < 0) {
+        if (this.velocity.length() < 0.05) {
             this.friction = new THREE.Vector3()
             this.velocity = new THREE.Vector3()
         }
@@ -72,6 +73,49 @@ class ball {
         const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
 
         currentGround.handleCollision(this)
+    }
+
+    wallCollision() {
+        // Set up pairs of meshes and wall class
+        const wallMeshes = walls.map(wall => wall.mesh)
+        const wallMap = new Map()
+        for (let i = 0; i < walls.length; ++i) {
+            wallMap.set(wallMeshes[i], walls[i])
+        }
+
+        // Cast a ray in the direction the ball is moving to detect walls that will collide
+        // @TODO This assumes ball is going perpendicular towards the wall, goes inside the wall if it has an angle
+        const raycaster = new THREE.Raycaster(this.mesh.position, this.velocity.clone().normalize())
+        const maxDistance = this.radius // Set a max distance to only have collision as ball hits the wall
+        raycaster.far = maxDistance
+
+        const intersects = raycaster.intersectObjects(wallMeshes) // Get the walls which are in the way of the ball
+        if (intersects.length > 0 && intersects[0].distance <= maxDistance) {
+            const intersection = intersects[0]
+
+            const collidedWallMesh = intersection.object
+            const collidedWall = wallMap.get(collidedWallMesh)
+
+            const faceNormal = intersection.face.normal.clone() // Normal of the intersected face, local coordinates
+            const angle = collidedWallMesh.rotation.y // Get the rotation of the mesh
+            // Create a rotation matrix for rotation around the y-axis
+            const rotationMatrix = new THREE.Matrix4()
+            rotationMatrix.makeRotationY(angle)
+
+            // Apply rotation to the normal
+            faceNormal.applyMatrix4(rotationMatrix);
+
+            collidedWall.setColor('orange')
+
+            // TEMP
+            // v_out = v - 2 * (v dot n) * n
+
+            // Calculate reflection of velocity vector based on normal
+            const reflection = faceNormal.clone().multiplyScalar(2 * this.velocity.dot(faceNormal))
+
+            // Apply new velocity to the ball after collision
+            this.velocity.sub(reflection)
+        }
     }
 }
 

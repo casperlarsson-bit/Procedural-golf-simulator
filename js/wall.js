@@ -17,7 +17,15 @@ class wall {
         this.mesh.geometry.computeBoundingBox()
         this.boundingBox = new THREE.Box3()
     }
+
+    setColor(color) {
+        this.color = color
+        const newMaterial = new THREE.MeshStandardMaterial({ color: color})
+
+        this.mesh.material = newMaterial
+    }
 }
+
 
 // v_out = v - 2 * (v dot n) * n
 
