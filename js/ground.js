@@ -24,10 +24,13 @@ class ground {
     }
 
     handleCollision(ball) {
-        // If collision with ground
-        if (this.isCollidingWithGround(ball)) {
+        const isCollidingWithGround = this.isCollidingWithGround(ball)
+
+        if (isCollidingWithGround) {
             if (ball.firstHit) {
-                ball.velocity.y *= Math.abs(ball.velocity.y) < 0.6 ? 0 : -0.6
+                const minBounceThreshold = 0.6
+                const bounceFactor = Math.abs(ball.velocity.y) < minBounceThreshold ? 0 : -0.6
+                ball.velocity.y *= bounceFactor
             }
 
             ball.force.y = 0
@@ -37,8 +40,7 @@ class ground {
         else {
             // Free falling
             ball.firstHit = true
-            ball.friction = new THREE.Vector3()
-            ball.force.y = -g // * ball.mass
+            ball.applyFreeFalling()
         }
     }
 

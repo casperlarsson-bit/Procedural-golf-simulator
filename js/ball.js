@@ -53,7 +53,50 @@ class ball {
     }
 
     gravity() {
-        // Loop through all grounds and find closest one (downwards)
+        const currentGround = this.findClosestGround()
+
+        if (!currentGround) {
+            this.applyFreeFalling()
+            return
+        }
+
+        currentGround.handleCollision(this)
+    }
+
+    wallCollision() {
+        // Cast a ray in the direction the ball is moving to detect walls that will collide
+        // @TODO This assumes ball is going perpendicular towards the wall, goes inside the wall if it has an angle
+        const raycaster = new THREE.Raycaster(this.mesh.position, this.velocity.clone().normalize())
+        const maxDistance = this.radius // Set a max distance to only have collision as the ball hits the wall
+        raycaster.far = maxDistance
+
+        // Get intersections between the ray and wall meshes
+        const intersects = raycaster.intersectObjects(walls.map(wall => wall.mesh))
+
+        if (intersects.length > 0) {
+            const intersection = intersects[0]
+            const collidedWall = walls.find(wall => wall.mesh === intersection.object)
+
+            const faceNormal = intersection.face.normal.clone() // Normal of the intersected face, local coordinates
+            const angle = collidedWall.mesh.rotation.y // Get the rotation of the mesh
+
+            // Apply rotation to the face normal
+            const rotationMatrix = new THREE.Matrix4().makeRotationY(angle)
+            faceNormal.applyMatrix4(rotationMatrix)
+
+            // Temporarily change the colour for visualisation
+            collidedWall.setColor('orange')
+
+            // Calculate reflection of velocity vector based on normal
+            // v_out = v - 2 * (v dot n) * n
+            const reflection = faceNormal.clone().multiplyScalar(2 * this.velocity.dot(faceNormal))
+
+            // Apply new velocity to the ball after collision
+            this.velocity.sub(reflection)
+        }
+    }
+
+    findClosestGround() {
         const currentGrounds = grounds.filter(currentGround => {
             currentGround.boundingBox.copy(currentGround.mesh.geometry.boundingBox).applyMatrix4(currentGround.mesh.matrixWorld)
 
@@ -62,60 +105,16 @@ class ball {
                 && currentGround.boundingBox.min.y < this.mesh.position.y - this.radius
         })
 
-        // If there is no ground underneath the ball, return
         if (currentGrounds.length === 0) {
-            this.friction = new THREE.Vector3()
-            this.force.y = -g // * this.mass
-            return
+            return null
         }
 
-        // Get the ground with highest y value
-        const currentGround = currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
-
-        currentGround.handleCollision(this)
+        return currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y) ? prev : current)
     }
 
-    wallCollision() {
-        // Set up pairs of meshes and wall class
-        const wallMeshes = walls.map(wall => wall.mesh)
-        const wallMap = new Map()
-        for (let i = 0; i < walls.length; ++i) {
-            wallMap.set(wallMeshes[i], walls[i])
-        }
-
-        // Cast a ray in the direction the ball is moving to detect walls that will collide
-        // @TODO This assumes ball is going perpendicular towards the wall, goes inside the wall if it has an angle
-        const raycaster = new THREE.Raycaster(this.mesh.position, this.velocity.clone().normalize())
-        const maxDistance = this.radius // Set a max distance to only have collision as ball hits the wall
-        raycaster.far = maxDistance
-
-        const intersects = raycaster.intersectObjects(wallMeshes) // Get the walls which are in the way of the ball
-        if (intersects.length > 0 && intersects[0].distance <= maxDistance) {
-            const intersection = intersects[0]
-
-            const collidedWallMesh = intersection.object
-            const collidedWall = wallMap.get(collidedWallMesh)
-
-            const faceNormal = intersection.face.normal.clone() // Normal of the intersected face, local coordinates
-            const angle = collidedWallMesh.rotation.y // Get the rotation of the mesh
-            // Create a rotation matrix for rotation around the y-axis
-            const rotationMatrix = new THREE.Matrix4()
-            rotationMatrix.makeRotationY(angle)
-
-            // Apply rotation to the normal
-            faceNormal.applyMatrix4(rotationMatrix);
-
-            collidedWall.setColor('orange')
-
-            // TEMP
-            // v_out = v - 2 * (v dot n) * n
-
-            // Calculate reflection of velocity vector based on normal
-            const reflection = faceNormal.clone().multiplyScalar(2 * this.velocity.dot(faceNormal))
-
-            // Apply new velocity to the ball after collision
-            this.velocity.sub(reflection)
-        }
+    applyFreeFalling() {
+        this.friction = new THREE.Vector3()
+        this.force.y = -g // * this.mass
     }
 }
 
