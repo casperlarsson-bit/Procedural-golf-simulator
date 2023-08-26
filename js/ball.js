@@ -1,14 +1,15 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { renderer, scene, camera, controls, init } from './setup.js'
 import { rotateAroundWorldAxis } from './rotation.js'
-import { grounds, walls } from './main.js'
+import { levelOne } from './main.js'
+import { LevelPart } from './levelPart.js'
 
 const h = 1 / 60
 const g = 9.82
 
 const texLoader = new THREE.TextureLoader()
 
-class ball {
+class Ball {
     constructor(_radius = 0.5, _mass = 0.6, _color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')) {
         this.radius = _radius
         this.geometry = new THREE.SphereGeometry(_radius, 42, 42) // Radius, width segments, height segments
@@ -64,6 +65,8 @@ class ball {
     }
 
     wallCollision() {
+        const walls = levelOne.getWalls()
+
         // Cast a ray in the direction the ball is moving to detect walls that will collide
         // @TODO This assumes ball is going perpendicular towards the wall, goes inside the wall if it has an angle
         const raycaster = new THREE.Raycaster(this.mesh.position, this.velocity.clone().normalize())
@@ -97,13 +100,7 @@ class ball {
     }
 
     findClosestGround() {
-        const currentGrounds = grounds.filter(currentGround => {
-            currentGround.boundingBox.copy(currentGround.mesh.geometry.boundingBox).applyMatrix4(currentGround.mesh.matrixWorld)
-
-            return currentGround.boundingBox.min.x < this.mesh.position.x && this.mesh.position.x < currentGround.boundingBox.max.x
-                && currentGround.boundingBox.min.z < this.mesh.position.z && this.mesh.position.z < currentGround.boundingBox.max.z
-                && currentGround.boundingBox.min.y < this.mesh.position.y - this.radius
-        })
+        const currentGrounds = levelOne.filterGrounds(this.mesh.position, this.radius)
 
         if (currentGrounds.length === 0) {
             return null
@@ -118,4 +115,4 @@ class ball {
     }
 }
 
-export { ball, h, g }
+export { Ball, h, g }

@@ -1,7 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { g } from './ball.js'
 
-class ground {
+class Ground {
     constructor(_length = 1, _height = 1, _depth = 1, _color = 'lightgreen') {
         this.length = _length
         this.height = _height
@@ -64,4 +64,4 @@ class ground {
     }
 }
 
-export { ground }
+export { Ground }

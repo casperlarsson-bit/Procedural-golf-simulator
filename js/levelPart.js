@@ -1,18 +1,18 @@
-import { ground } from './ground.js'
-import { wall } from './wall.js'
-import { obstacle } from './obstacle.js'
+import { Ground } from './ground.js'
+import { Wall } from './wall.js'
+import { Obstacle } from './obstacle.js'
 import { scene } from './setup.js'
 import { groundLevel } from './main.js'
 
-class levelPart {
-    constructor(_ground = new ground()) {
+class LevelPart {
+    constructor(_ground = new Ground()) {
         this.ground = _ground
         this.walls = []
         this.obstacles = []
     }
 
     // Add a wall to the current level part
-    addWall(wall = new wall()) {
+    addWall(wall = new Wall()) {
         this.walls.push(wall)
     }
 
@@ -26,6 +26,7 @@ class levelPart {
         scene.add(this.ground.mesh)
 
         this.walls.forEach(wall => scene.add(wall.mesh))
+        this.obstacles.forEach(obstacle => scene.add(obstacle.mesh))
     }
 
     // Generate a level part
@@ -33,8 +34,36 @@ class levelPart {
     generateLevelPart() {
         this.ground.mesh.position.y = groundLevel
 
+        const seed = getRandomInt(0, 1000000) // Generate random seed number, for now
+        const seededRandom = createSeededRandom(seed)
+
+        // Generate random numbers using the seeded random generator
+        const randomNumber = seededRandom()
+
+
+
+
         this.addToScene()
     }
 }
 
-export { levelPart }
+// Truncate a pseudo random number
+function createSeededRandom(seed) {
+    let state = seed % 2147483647 // 2^31 - 1
+    if (state <= 0) {
+        state += 2147483646
+    }
+
+    return () => {
+        state = state * 16807 % 2147483647
+        return (state - 1) / 2147483646
+    }
+}
+
+// Get a random integer between min (inclusive) and max (exclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+
+export { LevelPart }

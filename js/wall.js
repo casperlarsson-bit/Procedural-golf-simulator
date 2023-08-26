@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 
-class wall {
+class Wall {
     constructor(_position = new THREE.Vector3(), _length = 1, _height = 1, _depth = 1, _color = 'lightpink') {
         this.length = _length
         this.height = _height
@@ -75,4 +75,4 @@ const closestNormal = determineCollidedFaceNormal(collisionPoint, boxPosition, b
 console.log("Closest Normal:", closestNormal);
 */
 
-export { wall }
+export { Wall }

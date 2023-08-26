@@ -1,4 +1,4 @@
-class obstacle {
+class Obstacle {
     constructor() {
 
     }
@@ -9,4 +9,4 @@ class obstacle {
     }
 }
 
-export { obstacle }
+export { Obstacle }

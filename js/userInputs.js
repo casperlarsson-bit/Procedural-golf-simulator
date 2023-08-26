@@ -24,7 +24,6 @@ function handleTabKeyDown(event) {
     // Check if Tab key is pressed and not already handled
     if (event.key === 'Tab' && !isTabPressed) {
         isTabPressed = true
-        console.log(event.key)
     }
 
     if (event.key === 'Tab') event.preventDefault()
@@ -37,7 +36,6 @@ function handleTabKeyUp(event) {
         // Reset Tab key press state
         isTabPressed = false
         event.preventDefault()
-        console.log('Released')
     }
 }
 
