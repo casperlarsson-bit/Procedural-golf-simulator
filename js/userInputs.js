@@ -1,16 +1,57 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
-import { golfBall } from "./main.js"
+import { golfBall } from './main.js'
 import { renderer, scene, camera, controls, init } from './setup.js'
 
-function handleUserInputs(event) {
-    const keyCode = event.which
+// Flag to track Tab key press state
+let isTabPressed = false
 
-    // Space key
-    if (keyCode === 32 && golfBall.velocity.length() === 0) {
-        golfBall.tau = -controls.getAzimuthalAngle() - Math.PI / 2
-        golfBall.force = new THREE.Vector3(Math.cos(golfBall.tau), 0, Math.sin(golfBall.tau)).multiplyScalar(350)
-        //golfBall.friction = new THREE.Vector3(Math.cos(golfBall.tau), 0, Math.sin(golfBall.tau)).multiplyScalar(golfBall.mass * 9.82 * golfBall.my)
+// Function to shoot the ball
+function shootBall() {
+    // Check if the ball is not in motion
+    if (golfBall.velocity.length() === 0) {
+        // Calculate the angle and force to shoot the ball
+        const tau = -controls.getAzimuthalAngle() - Math.PI / 2
+        const force = new THREE.Vector3(Math.cos(tau), 0, Math.sin(tau)).multiplyScalar(350)
+
+        // Update the ball's properties
+        golfBall.tau = tau
+        golfBall.force = force
     }
 }
 
-export { handleUserInputs }
+// Event listener for Tab key press
+function handleTabKeyDown(event) {
+    // Check if Tab key is pressed and not already handled
+    if (event.key === 'Tab' && !isTabPressed) {
+        isTabPressed = true
+    }
+
+    if (event.key === 'Tab') event.preventDefault()
+}
+
+// Event listener for Tab key release
+function handleTabKeyUp(event) {
+    // Check if Tab key is released
+    if (event.key === 'Tab') {
+        // Reset Tab key press state
+        isTabPressed = false
+        event.preventDefault()
+    }
+}
+
+// Add event listener for keydown
+document.addEventListener('keydown', (event) => {
+    // Call shootBall function on Space key press
+    if (event.key === ' ') {
+        shootBall()
+    }
+
+    // Call handleTabKeyDown function for Tab key press
+    handleTabKeyDown(event)
+})
+
+// Add event listener for keyup
+document.addEventListener('keyup', handleTabKeyUp)
+
+// Export event handling functions for external use
+export { handleTabKeyDown, handleTabKeyUp }

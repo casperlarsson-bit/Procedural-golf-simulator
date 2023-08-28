@@ -1,19 +1,15 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
-import { renderer, scene, camera, controls, init } from './setup.js'
-import { ball, h } from './ball.js'
-import { ground } from './ground.js'
-import { handleUserInputs } from './userInputs.js'
+import { renderer, scene, camera, controls, init, updateCameraPosition } from './setup.js'
+import { Ball, h } from './ball.js'
+import { Level } from './level.js'
 
-const grounds = []
+const groundLevel = -1
 
-const golfBall = new ball(1)
-golfBall.mesh.position.y = 0
+const golfBall = new Ball(0.2)
+golfBall.mesh.position.y = 1
 scene.add(golfBall.mesh)
 
-const ground1 = new ground(10, 0.1, 10)
-ground1.mesh.position.y = -1
-grounds.push(ground1)
-scene.add(ground1.mesh)
+const levelOne = new Level()
+levelOne.generateLevel()
 
 function animate() {
     //controls.update()
@@ -21,9 +17,8 @@ function animate() {
 
         requestAnimationFrame(animate)
 
-        document.addEventListener('keydown', handleUserInputs, false)
-
         golfBall.euler()
+        updateCameraPosition()
         renderer.render(scene, camera)
     }, 1000 * h)
 }
@@ -31,4 +26,4 @@ function animate() {
 init()
 animate()
 
-export { golfBall, grounds }
+export { golfBall, groundLevel, levelOne, }
