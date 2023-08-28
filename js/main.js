@@ -1,7 +1,5 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { renderer, scene, camera, controls, init, updateCameraPosition } from './setup.js'
 import { Ball, h } from './ball.js'
-import { handleTabKeyDown, handleTabKeyUp } from './userInputs.js'
 import { Level } from './level.js'
 
 const groundLevel = -1
@@ -13,15 +11,11 @@ scene.add(golfBall.mesh)
 const levelOne = new Level()
 levelOne.generateLevel()
 
-
-
 function animate() {
     //controls.update()
     setTimeout(() => {
 
         requestAnimationFrame(animate)
-
-        //document.addEventListener('keydown', handleUserInputs, false)
 
         golfBall.euler()
         updateCameraPosition()

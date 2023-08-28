@@ -1,4 +1,3 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { Ground } from './ground.js'
 import { Wall } from './wall.js'
 import { Obstacle } from './obstacle.js'
@@ -10,21 +9,8 @@ class Level {
     }
 
     generateLevel() {
-        const ground1 = new Ground(10, 0.1, 10)
-        //grounds.push(ground1)
-
-        const wall1 = new Wall(new THREE.Vector3(2, -0.5, 0))
-        wall1.mesh.rotation.y = 2
-        //walls.push(wall1)
-
-        const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 1, 1, 10)
-        //wall2.mesh.rotation.y = 0
-        //walls.push(wall2)
-
-        const levelPart1 = new LevelPart(ground1)
+        const levelPart1 = new LevelPart()
         this.levelParts.push(levelPart1)
-        levelPart1.addWall(wall1)
-        levelPart1.addWall(wall2)
         levelPart1.generateLevelPart()
     }
 
@@ -43,6 +29,28 @@ class Level {
     getWalls() {
         return this.levelParts.map(levelPart => levelPart.walls).reduce((initial, current) => initial.concat(current), [])
     }
+
+    getObstacles() {
+        return this.levelParts.map(levelPart => levelPart.obstacles).reduce((initial, current) => initial.concat(current), [])
+    }
 }
 
-export { Level }
+// Truncate a pseudo random number
+function createSeededRandom(seed) {
+    let state = seed % 2147483647 // 2^31 - 1
+    if (state <= 0) {
+        state += 2147483646
+    }
+
+    return () => {
+        state = state * 16807 % 2147483647
+        return (state - 1) / 2147483646
+    }
+}
+
+// Get a random integer between min (inclusive) and max (exclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export { Level, createSeededRandom, getRandomInt }

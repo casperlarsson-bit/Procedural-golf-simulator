@@ -1,14 +1,21 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { Ground } from './ground.js'
 import { Wall } from './wall.js'
 import { Obstacle } from './obstacle.js'
 import { scene } from './setup.js'
 import { groundLevel } from './main.js'
+import { createSeededRandom, getRandomInt } from './level.js'
 
 class LevelPart {
     constructor(_ground = new Ground()) {
         this.ground = _ground
         this.walls = []
         this.obstacles = []
+    }
+
+    // Seth the ground form argument instead of initialisation
+    setGround(ground = new Ground()) {
+        this.ground = ground
     }
 
     // Add a wall to the current level part
@@ -32,38 +39,27 @@ class LevelPart {
     // Generate a level part
     // Should be seed based and maybe be able to get info about adjacent parts to know where walls should be placed
     generateLevelPart() {
-        this.ground.mesh.position.y = groundLevel
-
         const seed = getRandomInt(0, 1000000) // Generate random seed number, for now
         const seededRandom = createSeededRandom(seed)
 
         // Generate random numbers using the seeded random generator
         const randomNumber = seededRandom()
 
+        const ground1 = new Ground(10, 0.1, 10)
+        ground1.mesh.position.y = groundLevel
+        const wall1 = new Wall(new THREE.Vector3(10 * seededRandom() - 5, -0.5, 10 * seededRandom() - 5))
+        wall1.mesh.rotation.y = seededRandom()
 
+        const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 0.1, 1, 10 * seededRandom())
+        //wall2.mesh.rotation.y = 0
+
+        this.setGround(ground1)
+        this.addWall(wall1)
+        this.addWall(wall2)
 
 
         this.addToScene()
     }
 }
-
-// Truncate a pseudo random number
-function createSeededRandom(seed) {
-    let state = seed % 2147483647 // 2^31 - 1
-    if (state <= 0) {
-        state += 2147483646
-    }
-
-    return () => {
-        state = state * 16807 % 2147483647
-        return (state - 1) / 2147483646
-    }
-}
-
-// Get a random integer between min (inclusive) and max (exclusive)
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 
 export { LevelPart }
