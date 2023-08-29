@@ -1,5 +1,6 @@
 import { renderer, scene, camera, controls, init, updateCameraPosition } from './setup.js'
 import { Ball, h } from './ball.js'
+import { handleTabKeyDown, handleTabKeyUp } from './userInputs.js'
 import { Level } from './level.js'
 
 const groundLevel = -1
