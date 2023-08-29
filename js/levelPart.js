@@ -38,9 +38,13 @@ class LevelPart {
 
     // Generate a level part
     // Should be seed based and maybe be able to get info about adjacent parts to know where walls should be placed
-    generateLevelPart() {
-        const seed = getRandomInt(0, 1000000) // Generate random seed number, for now
+    generateLevelPart(seed = getRandomInt(0, 1000000), prevLevelPart = null) {
         const seededRandom = createSeededRandom(seed)
+
+        // No previous level part, this is the start plate
+        if (!prevLevelPart) {
+
+        }
 
         // Generate random numbers using the seeded random generator
         const randomNumber = seededRandom()
