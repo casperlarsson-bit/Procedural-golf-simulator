@@ -41,19 +41,16 @@ class LevelPart {
     generateLevelPart(offset = 0, seed = getRandomInt(0, 1000000)) {
         const seededRandom = createSeededRandom(seed)
 
-        console.log(offset)
-
-        const ground1 = new Ground(10, 0.1, 10)
-        ground1.mesh.position.y = groundLevel
-        ground1.mesh.position.x = offset
+        const ground = new Ground(10, 0.1, 7)
+        ground.mesh.position.y = groundLevel
+        ground.mesh.position.x = offset - 1
 
         const wall1 = new Wall(new THREE.Vector3(10 * seededRandom() - 5, -0.5, 10 * seededRandom() - 5))
         wall1.mesh.rotation.y = seededRandom()
 
         const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 0.1, 1, 10 * seededRandom())
-        //wall2.mesh.rotation.y = 0
 
-        this.setGround(ground1)
+        this.setGround(ground)
         this.addWall(wall1)
         this.addWall(wall2)
 

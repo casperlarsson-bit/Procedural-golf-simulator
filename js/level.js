@@ -12,24 +12,23 @@ class Level {
     generateLevel(seed = getRandomInt(0, 1000000), prevLevelPart = null) {
         const seededRandom = createSeededRandom(seed)
 
-        //const levelPart1 = new LevelPart()
-        //this.levelParts.push(levelPart1)
-
         // Generate parts goes here :(
         let tempCounter = 0
         while (tempCounter < 100) {
-            
+
+            // Initial level part
             if (!prevLevelPart) {
+                console.log('First')
                 prevLevelPart = new LevelPart()
                 //this.levelParts.push(prevLevelPart)
                 //continue
             }
-            
+
+            // Final level part with hole, terminate
             if (prevLevelPart && seededRandom() > 0.8 && tempCounter > 2) {
-                console.log('Here ' + tempCounter)
                 return
             }
-            
+
             const newLevelPart = new LevelPart()
             prevLevelPart = newLevelPart.generateLevelPart(prevLevelPart.ground.mesh.position.x + prevLevelPart.ground.length)
             this.levelParts.push(prevLevelPart)
@@ -39,10 +38,10 @@ class Level {
 
     filterGrounds(position, radius) {
         const grounds = this.levelParts.map(levelPart => levelPart.ground)
-        
+
         return grounds.filter(currentGround => {
             currentGround.boundingBox.copy(currentGround.mesh.geometry.boundingBox).applyMatrix4(currentGround.mesh.matrixWorld)
-            
+
             return currentGround.boundingBox.min.x < position.x && position.x < currentGround.boundingBox.max.x
                 && currentGround.boundingBox.min.z < position.z && position.z < currentGround.boundingBox.max.z
                 && currentGround.boundingBox.min.y < position.y - radius
