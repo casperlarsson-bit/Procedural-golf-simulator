@@ -18,7 +18,6 @@ class Level {
 
             // Initial level part
             if (!prevLevelPart) {
-                console.log('First')
                 prevLevelPart = new LevelPart()
                 //this.levelParts.push(prevLevelPart)
                 //continue

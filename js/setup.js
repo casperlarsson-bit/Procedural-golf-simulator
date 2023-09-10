@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.124/examples/jsm/controls/OrbitControls.js'
 import { golfBall } from './main.js'
+import { DirectionArrow } from './directionArrow.js'
 
 const renderer = new THREE.WebGLRenderer()
 renderer.shadowMap.enabled = true
@@ -8,6 +9,7 @@ renderer.shadowMap.enabled = true
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000) // FOV, window ratio, near, far
 const controls = new OrbitControls(camera, renderer.domElement)
+const arrow = new DirectionArrow()
 controls.update()
 
 function setLight() {
@@ -36,11 +38,22 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
+const cameraTarget = new THREE.Vector3(); // The point the camera should follow
+const cameraDistance = 10; // The distance between the camera and the golf ball
+
 // Make the camera follow and look at the ball
 // Right now, the camera gets locked and you can not rotate
 function updateCameraPosition() {
     // camera.position.copy(golfBall.mesh.position).add(new THREE.Vector3(0, 5, 10)) // Adjust the offset as needed
     // camera.lookAt(golfBall.mesh.position)
+
+    // Assuming golfBall.position is the position of your golf ball
+    cameraTarget.copy(golfBall.mesh.position);
+    cameraTarget.y += cameraDistance; // Adjust the camera height
+
+    // Use linear interpolation to smoothly move the camera towards the target
+    camera.position.lerp(cameraTarget, 0.1);
+    camera.lookAt(golfBall.mesh.position);
 }
 
-export { renderer, scene, camera, controls, init, updateCameraPosition }
+export { renderer, scene, camera, controls, init, updateCameraPosition, arrow }
