@@ -4,31 +4,73 @@ import { golfBall } from './main.js'
 
 class DirectionArrow {
     constructor() {
-        this.vertices = new Float32Array([
+        // Define the vertices array
+        const vertices = new Float32Array([
             -1.0, -1.0, 0.0,    // vertex 1
             1.0, -1.0, 0.0,     // vertex 2
             1.0, 1.0, 1.0,      // vertex 3
         ])
 
-        this.geometry = new THREE.BufferGeometry()
-        this.geometry.setAttribute('position', new THREE.BufferAttribute(this.vertices, 3))
-        this.material = new THREE.MeshBasicMaterial({ color: 'red', side: THREE.DoubleSide })
-        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        // Create the geometry and set the position attribute
+        const geometry = new THREE.BufferGeometry()
+        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
 
-        scene.add(this.mesh)
+        // Create the material
+        const material = new THREE.MeshBasicMaterial({ color: 'lightgray', side: THREE.DoubleSide })
+
+        // Create the mesh using the geometry and material
+        const mesh = new THREE.Mesh(geometry, material)
+
+        // Add the mesh to the scene
+        scene.add(mesh)
+
+        // Assign the created objects to instance variables
+        this.geometry = geometry
+        this.material = material
+        this.mesh = mesh
     }
 
     updatePosition() {
-        const tau = -controls.getAzimuthalAngle() - Math.PI / 2
-        const direction = golfBall.mesh.position.clone().add(new THREE.Vector3(Math.cos(tau), 0, Math.sin(tau)).normalize().multiplyScalar(5))
+        // Check if arrow should be visible
+        if (golfBall.velocity.length() !== 0 || golfBall.farFromGround()) {
+            this.turnOff()
+            return
+        }
 
-        this.vertices = new Float32Array([
-            golfBall.mesh.position.x, golfBall.mesh.position.y, golfBall.mesh.position.z,    // vertex 1
-            13.0, -5.0, 2.0,     // vertex 2
-            direction.x, direction.y, direction.z,      // vertex 3
+        this.turnOn()
+
+        // Calculate the tau and sideAngle values
+        const tau = -controls.getAzimuthalAngle() - Math.PI / 2
+        const sideAngle = -controls.getAzimuthalAngle()
+
+        // Calculate the main direction vector
+        const mainDirection = new THREE.Vector3(Math.cos(tau), 0, Math.sin(tau)).normalize().multiplyScalar(4)
+
+        // Calculate the side direction vector
+        const sideDirection = new THREE.Vector3(Math.cos(sideAngle), 0, Math.sin(sideAngle)).normalize().multiplyScalar(golfBall.radius / 2)
+
+        // Calculate the vertices
+        const vertex1 = golfBall.mesh.position.clone().sub(sideDirection)
+        const vertex2 = golfBall.mesh.position.clone().add(sideDirection)
+        const vertex3 = golfBall.mesh.position.clone().add(mainDirection)
+
+        // Create the vertices array
+        const vertices = new Float32Array([
+            vertex1.x, vertex1.y, vertex1.z, // vertex 1
+            vertex2.x, vertex2.y, vertex2.z, // vertex 2
+            vertex3.x, vertex3.y, vertex3.z  // vertex 3
         ])
 
-        this.geometry.setAttribute('position', new THREE.BufferAttribute(this.vertices, 3))
+        // Update the position attribute of the geometry
+        this.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    }
+
+    turnOn() {
+        this.mesh.visible = true
+    }
+
+    turnOff() {
+        this.mesh.visible = false
     }
 }
 
