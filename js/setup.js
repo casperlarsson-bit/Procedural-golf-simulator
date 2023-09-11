@@ -13,7 +13,7 @@ const arrow = new DirectionArrow()
 controls.update()
 
 function setLight() {
-    const light = new THREE.AmbientLight(0xffffff, 0.2) // Soft white light; color, intensity
+    const light = new THREE.AmbientLight(0xffffff, 0.2) // Soft white light color, intensity
     scene.add(light)
     const pointLight = new THREE.PointLight(0xffffff, 1, 0) // Color, near, far
     pointLight.position.set(50, 50, 50)
@@ -26,6 +26,7 @@ function setLight() {
 function init() {
     scene.background = new THREE.Color('#78a7ff')
     camera.position.z = 5
+    camera.position.y = 2
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(renderer.domElement)
     setLight()
@@ -38,22 +39,4 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
-const cameraTarget = new THREE.Vector3(); // The point the camera should follow
-const cameraDistance = 10; // The distance between the camera and the golf ball
-
-// Make the camera follow and look at the ball
-// Right now, the camera gets locked and you can not rotate
-function updateCameraPosition() {
-    // camera.position.copy(golfBall.mesh.position).add(new THREE.Vector3(0, 5, 10)) // Adjust the offset as needed
-    // camera.lookAt(golfBall.mesh.position)
-
-    // Assuming golfBall.position is the position of your golf ball
-    cameraTarget.copy(golfBall.mesh.position);
-    cameraTarget.y += cameraDistance; // Adjust the camera height
-
-    // Use linear interpolation to smoothly move the camera towards the target
-    camera.position.lerp(cameraTarget, 0.1);
-    camera.lookAt(golfBall.mesh.position);
-}
-
-export { renderer, scene, camera, controls, init, updateCameraPosition, arrow }
+export { renderer, scene, camera, controls, init, arrow }
