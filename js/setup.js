@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.124/examples/jsm/controls/OrbitControls.js'
 import { golfBall } from './main.js'
+import { DirectionArrow } from './directionArrow.js'
 
 const renderer = new THREE.WebGLRenderer()
 renderer.shadowMap.enabled = true
@@ -8,10 +9,11 @@ renderer.shadowMap.enabled = true
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000) // FOV, window ratio, near, far
 const controls = new OrbitControls(camera, renderer.domElement)
+const arrow = new DirectionArrow()
 controls.update()
 
 function setLight() {
-    const light = new THREE.AmbientLight(0xffffff, 0.2) // Soft white light; color, intensity
+    const light = new THREE.AmbientLight(0xffffff, 0.2) // Soft white light color, intensity
     scene.add(light)
     const pointLight = new THREE.PointLight(0xffffff, 1, 0) // Color, near, far
     pointLight.position.set(50, 50, 50)
@@ -24,6 +26,7 @@ function setLight() {
 function init() {
     scene.background = new THREE.Color('#78a7ff')
     camera.position.z = 5
+    camera.position.y = 2
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(renderer.domElement)
     setLight()
@@ -36,11 +39,4 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
-// Make the camera follow and look at the ball
-// Right now, the camera gets locked and you can not rotate
-function updateCameraPosition() {
-    // camera.position.copy(golfBall.mesh.position).add(new THREE.Vector3(0, 5, 10)) // Adjust the offset as needed
-    // camera.lookAt(golfBall.mesh.position)
-}
-
-export { renderer, scene, camera, controls, init, updateCameraPosition }
+export { renderer, scene, camera, controls, init, arrow }

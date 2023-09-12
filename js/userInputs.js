@@ -1,6 +1,8 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import { golfBall } from './main.js'
 import { renderer, scene, camera, controls, init } from './setup.js'
+import { arrow } from './setup.js'
+import { h } from './ball.js'
 
 // Flag to track Tab key press state
 let isTabPressed = false
@@ -17,6 +19,13 @@ function shootBall() {
         golfBall.tau = tau
         golfBall.force = force
     }
+}
+
+// Make the camera follow and look at the ball
+function updateCameraPosition() {
+    camera.lookAt(golfBall.mesh.position)
+    camera.position.copy(camera.position.clone().add(golfBall.velocity.clone().multiplyScalar(h)))
+    controls.target.copy(golfBall.mesh.position)
 }
 
 // Event listener for Tab key press
@@ -54,4 +63,4 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keyup', handleTabKeyUp)
 
 // Export event handling functions for external use
-export { handleTabKeyDown, handleTabKeyUp }
+export { handleTabKeyDown, handleTabKeyUp, updateCameraPosition }

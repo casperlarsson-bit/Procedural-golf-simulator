@@ -113,6 +113,14 @@ class Ball {
         this.friction = new THREE.Vector3()
         this.force.y = -g // * this.mass
     }
+
+    farFromGround() {
+        const currentGround = this.findClosestGround()
+
+        if (!currentGround) return true
+
+        return Math.abs(currentGround.mesh.position.y - this.mesh.position.y) > (currentGround.height / 2 + this.radius)
+    }
 }
 
 export { Ball, h, g }
