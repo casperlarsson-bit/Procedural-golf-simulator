@@ -14,7 +14,7 @@ class Level {
 
 		// Generate parts goes here :(
 		let tempCounter = 0
-		while (tempCounter < 1) {
+		while (tempCounter < 10) {
 			// Initial level part
 			if (!prevLevelPart) {
 				// prevLevelPart = new LevelPart()

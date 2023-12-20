@@ -16,20 +16,6 @@ controls.update()
 const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0) // Set gravity
 
-// Create materials
-const ballMaterial = new CANNON.Material()
-const groundMaterial = new CANNON.Material()
-
-// Define contact material between ball and ground
-const ballGroundContactMaterial = new CANNON.ContactMaterial(ballMaterial, groundMaterial, {
-	friction: 0.5, // Adjust this value as needed
-	restitution: 0.5, // Adjust this value for bounciness
-	// Other properties like stiffness, relaxation, etc. can also be added
-})
-
-// Add contact material to the world
-world.addContactMaterial(ballGroundContactMaterial)
-
 function setLight() {
 	const light = new THREE.AmbientLight(0xffffff, 0.2) // Soft white light color, intensity
 	scene.add(light)
@@ -65,4 +51,4 @@ function cannonToThree(cannonVector) {
 	return new THREE.Vector3(cannonVector.x, cannonVector.y, cannonVector.z)
 }
 
-export { renderer, scene, camera, controls, init, arrow, threeToCannon, cannonToThree, world, ballMaterial, groundMaterial }
+export { renderer, scene, camera, controls, init, arrow, threeToCannon, cannonToThree, world }

@@ -20,12 +20,12 @@ class LevelPart {
 	}
 
 	// Add a wall to the current level part
-	addWall(wall = new Wall()) {
+	addWall(wall) {
 		this.walls.push(wall)
 	}
 
 	// Add an obstacle to the current levelpart
-	addObstacle(obstacle = new obstacle()) {
+	addObstacle(obstacle) {
 		this.obstacles.push(obstacle)
 	}
 
@@ -48,9 +48,10 @@ class LevelPart {
 		ground.body.position.copy(ground.mesh.position)
 
 		const wall1 = new Wall(new THREE.Vector3(10 * seededRandom() - 5, -0.5, 10 * seededRandom() - 5))
-		wall1.mesh.rotation.y = seededRandom()
+		// const wall1 = new Wall(new THREE.Vector3(0, -0.5, 0))
+		wall1.rotate(seededRandom())
 
-		const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 0.1, 1, 10 * seededRandom())
+		const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 0.1, 1, 10 * seededRandom(), 'red')
 
 		this.setGround(ground)
 		this.addWall(wall1)

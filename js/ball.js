@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js'
-import { renderer, scene, camera, controls, init, threeToCannon, cannonToThree, world, ballMaterial } from './setup.js'
+import { renderer, scene, camera, controls, init, threeToCannon, cannonToThree, world } from './setup.js'
+import { ballMaterial } from './material.js'
 import { rotateAroundWorldAxis } from './rotation.js'
 import { levelOne } from './main.js'
 import { LevelPart } from './levelPart.js'
@@ -29,12 +30,11 @@ class Ball {
 		this.mesh.position.copy(_position)
 
 		// Cannon.js for physics
-		// const ballMaterial = new CANNON.Material() // Create a material
-		// ballMaterial.restitution = 1 // Set the restitution to control bouncing (adjust the value as needed)
-
 		this.shape = new CANNON.Sphere(_radius)
 		this.body = new CANNON.Body({ mass: _mass, shape: this.shape })
 		this.body.material = ballMaterial
+		// this.body.linearDamping = 0.5
+		this.body.angularDamping = 0.7
 		this.body.position.set(_position.x, _position.y, _position.z)
 		world.addBody(this.body)
 
@@ -47,106 +47,39 @@ class Ball {
 		this.force = new THREE.Vector3()
 		this.tau = 0
 		this.friction = new THREE.Vector3()
+		this.deltaPosition = new CANNON.Vec3()
 	}
 
 	updatePosition() {
-		// Handle gravity
-		const gravityForce = new CANNON.Vec3(0, -g * this.body.mass, 0)
-		this.body.applyForce(gravityForce, this.body.position)
+		// Initialize previous position
+		const previousPosition = this.body.position.clone()
 
 		// Update Cannon.js simulation
 		world.step(h)
 
+		if (this.body.velocity.length() < 0.1) {
+			this.body.velocity.copy(new CANNON.Vec3())
+		}
+
+		// Get current position
+		const currentPosition = this.body.position.clone()
+		this.deltaPosition = currentPosition.vsub(previousPosition)
+
 		// Update Three.js mesh position based on Cannon.js body position
 		this.mesh.position.copy(this.body.position)
+		this.mesh.quaternion.copy(this.body.quaternion)
 		this.velocity = cannonToThree(this.body.velocity)
 	}
 
-	// euler() {
-	// 	this.gravity()
-	// 	this.wallCollision()
+	findClosestGround() {
+		const currentGrounds = levelOne.filterGrounds(this.mesh.position, this.radius)
 
-	// 	// Calculate acceleration according to ODE v' = (F - F_friction) / m
-	// 	const acceleration = this.force.sub(this.friction).divideScalar(this.mass)
-	// 	this.force = new THREE.Vector3()
+		if (currentGrounds.length === 0) {
+			return null
+		}
 
-	// 	// Iterate next velocity according to Euler's method
-	// 	this.velocity.add(acceleration.multiplyScalar(h))
-
-	// 	// Iterate next position according to Euler's method
-	// 	this.mesh.position.copy(this.mesh.position.clone().add(this.velocity.clone().multiplyScalar(h)))
-
-	// 	// Rotate ball as it moves
-	// 	rotateAroundWorldAxis(this.mesh, new THREE.Vector3(this.velocity.z, 0, -this.velocity.x), (this.velocity.length() / this.radius) * h)
-
-	// 	// Test if ball should stop, then remove friction and set velocity to 0, this has to be done better
-	// 	//if (this.velocity.x * Math.cos(this.tau) < 0) {
-	// 	if (this.velocity.length() < 0.05) {
-	// 		this.friction = new THREE.Vector3()
-	// 		this.velocity = new THREE.Vector3()
-	// 	}
-	// }
-
-	// gravity() {
-	// 	const currentGround = this.findClosestGround()
-
-	// 	if (!currentGround) {
-	// 		this.applyFreeFalling()
-	// 		return
-	// 	}
-
-	// 	currentGround.handleCollision(this)
-	// }
-
-	// wallCollision() {
-	// 	const walls = levelOne.getWalls()
-
-	// 	// Cast a ray in the direction the ball is moving to detect walls that will collide
-	// 	// @TODO This assumes ball is going perpendicular towards the wall, goes inside the wall if it has an angle
-	// 	const raycaster = new THREE.Raycaster(this.mesh.position, this.velocity.clone().normalize())
-	// 	const maxDistance = this.radius // Set a max distance to only have collision as the ball hits the wall
-	// 	raycaster.far = maxDistance
-
-	// 	// Get intersections between the ray and wall meshes
-	// 	const intersects = raycaster.intersectObjects(walls.map((wall) => wall.mesh))
-
-	// 	if (intersects.length > 0) {
-	// 		const intersection = intersects[0]
-	// 		const collidedWall = walls.find((wall) => wall.mesh === intersection.object)
-
-	// 		const faceNormal = intersection.face.normal.clone() // Normal of the intersected face, local coordinates
-	// 		const angle = collidedWall.mesh.rotation.y // Get the rotation of the mesh
-
-	// 		// Apply rotation to the face normal
-	// 		const rotationMatrix = new THREE.Matrix4().makeRotationY(angle)
-	// 		faceNormal.applyMatrix4(rotationMatrix)
-
-	// 		// Temporarily change the colour for visualisation
-	// 		collidedWall.setColor('orange')
-
-	// 		// Calculate reflection of velocity vector based on normal
-	// 		// v_out = v - 2 * (v dot n) * n
-	// 		const reflection = faceNormal.clone().multiplyScalar(2 * this.velocity.dot(faceNormal))
-
-	// 		// Apply new velocity to the ball after collision
-	// 		this.velocity.sub(reflection)
-	// 	}
-	// }
-
-	// findClosestGround() {
-	// 	const currentGrounds = levelOne.filterGrounds(this.mesh.position, this.radius)
-
-	// 	if (currentGrounds.length === 0) {
-	// 		return null
-	// 	}
-
-	// 	return currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y ? prev : current))
-	// }
-
-	// applyFreeFalling() {
-	// 	this.friction = new THREE.Vector3()
-	// 	this.force.y = -g // * this.mass
-	// }
+		return currentGrounds.reduce((prev, current) => (prev.boundingBox.min.y > current.boundingBox.min.y ? prev : current))
+	}
 
 	farFromGround() {
 		const currentGround = this.findClosestGround()

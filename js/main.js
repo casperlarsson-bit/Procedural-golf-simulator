@@ -6,7 +6,7 @@ import { Level } from './level.js'
 
 const groundLevel = -1
 
-const golfBall = new Ball(0.2, new THREE.Vector3(0, 5, 0))
+const golfBall = new Ball(0.2, new THREE.Vector3(0, 2, 0))
 scene.add(golfBall.mesh)
 
 const levelOne = new Level()
@@ -17,9 +17,6 @@ function animate() {
 	setTimeout(() => {
 		requestAnimationFrame(animate)
 
-		// console.log(golfBall.mesh.position.y - golfBall.body.position.y)
-
-		// golfBall.euler()
 		golfBall.updatePosition()
 		arrow.updatePosition()
 		updateCameraPosition()

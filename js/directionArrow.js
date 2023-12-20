@@ -33,7 +33,7 @@ class DirectionArrow {
 
     updatePosition() {
         // Check if arrow should be visible
-        if (golfBall.velocity.length() !== 0 || golfBall.farFromGround()) {
+        if (golfBall.velocity.length() > 0.00001 || golfBall.farFromGround()) {
             this.turnOff()
             return
         }
