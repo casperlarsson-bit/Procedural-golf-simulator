@@ -1,6 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js'
-import * as NOISE from '../node_modules/noisejs/index.js'
 import { Ground } from './ground.js'
 import { Wall } from './wall.js'
 import { Obstacle } from './obstacle.js'
