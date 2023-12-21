@@ -6,7 +6,7 @@ import { Level } from './level.js'
 
 const groundLevel = -1
 
-const golfBall = new Ball(0.2, new THREE.Vector3(0, 2, 0))
+const golfBall = new Ball(0.2, new THREE.Vector3(0, 2, 0), 1.5)
 scene.add(golfBall.mesh)
 
 const levelOne = new Level()

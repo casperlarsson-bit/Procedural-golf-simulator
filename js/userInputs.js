@@ -11,10 +11,10 @@ let isTabPressed = false
 // Function to shoot the ball
 function shootBall() {
 	// Check if the ball is not in motion
-	if (golfBall.velocity.length() < 0.001) {
+	if (golfBall.velocity.length() === 0) {
 		// Calculate the angle and force to shoot the ball
 		const tau = -controls.getAzimuthalAngle() - Math.PI / 2
-		const impulse = new THREE.Vector3(Math.cos(tau), 0, Math.sin(tau)).multiplyScalar(350 * h)
+		const impulse = new THREE.Vector3(Math.cos(tau), 0, Math.sin(tau)).multiplyScalar(700 * h)
 		const topPoint = new CANNON.Vec3(0, golfBall.radius / 2, 0)
 		golfBall.body.applyImpulse(threeToCannon(impulse), topPoint)
 	}

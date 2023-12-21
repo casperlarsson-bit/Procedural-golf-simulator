@@ -1,5 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js'
 import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js'
+import * as NOISE from '../node_modules/noisejs/index.js'
 import { Ground } from './ground.js'
 import { Wall } from './wall.js'
 import { Obstacle } from './obstacle.js'
@@ -49,7 +50,7 @@ class LevelPart {
 
 		const wall1 = new Wall(new THREE.Vector3(10 * seededRandom() - 5, -0.5, 10 * seededRandom() - 5))
 		// const wall1 = new Wall(new THREE.Vector3(0, -0.5, 0))
-		wall1.rotate(seededRandom())
+		wall1.rotateY(seededRandom())
 
 		const wall2 = new Wall(new THREE.Vector3(-4.5, -0.5, 0), 0.1, 1, 10 * seededRandom(), 'red')
 

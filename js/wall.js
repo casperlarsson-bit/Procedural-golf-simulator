@@ -35,12 +35,42 @@ class Wall {
 		this.mesh.material = newMaterial
 	}
 
-	rotate(angle) {
+	rotateX(angle) {
+		// THREE.js model
+		this.mesh.rotation.x = angle
+
+		// CANNON.js
+		const euler = new CANNON.Vec3(angle, 0, 0) // Assuming rotation is along the y-axis
+
+		// Convert Euler angles to quaternion
+		const quaternion = new CANNON.Quaternion()
+		quaternion.setFromEuler(euler.x, euler.y, euler.z)
+
+		// Apply the quaternion to the body
+		this.body.quaternion.copy(quaternion)
+	}
+
+	rotateY(angle) {
 		// THREE.js model
 		this.mesh.rotation.y = angle
 
 		// CANNON.js
 		const euler = new CANNON.Vec3(0, angle, 0) // Assuming rotation is along the y-axis
+
+		// Convert Euler angles to quaternion
+		const quaternion = new CANNON.Quaternion()
+		quaternion.setFromEuler(euler.x, euler.y, euler.z)
+
+		// Apply the quaternion to the body
+		this.body.quaternion.copy(quaternion)
+	}
+
+	rotateZ(angle) {
+		// THREE.js model
+		this.mesh.rotation.z = angle
+
+		// CANNON.js
+		const euler = new CANNON.Vec3(0, 0, angle) // Assuming rotation is along the y-axis
 
 		// Convert Euler angles to quaternion
 		const quaternion = new CANNON.Quaternion()
