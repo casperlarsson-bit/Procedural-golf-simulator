@@ -2,6 +2,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.mod
 import { renderer, scene, camera, controls, init } from './setup.js'
 import { golfBall } from './main.js'
 
+// To show the viewing angle
 class DirectionArrow {
     constructor() {
         // Define the vertices array
@@ -32,7 +33,7 @@ class DirectionArrow {
 
     updatePosition() {
         // Check if arrow should be visible
-        if (golfBall.velocity.length() !== 0 || golfBall.farFromGround()) {
+        if (golfBall.velocity.length() > 0.00001 || golfBall.farFromGround()) {
             this.turnOff()
             return
         }
